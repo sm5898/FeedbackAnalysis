@@ -598,6 +598,27 @@ class FeedbackIntelligenceApp {
         this.updateCharts();
     }
 
+    async refreshData() {
+        // Show loading state
+        this.showNotification('Refreshing data...', 'info');
+        
+        try {
+            // Reload feedback from Worker
+            await this.loadFeedbackFromWorker();
+            
+            // Update all components
+            this.updateStats();
+            this.renderFeedback();
+            this.updateCharts();
+            this.loadAIInsights();
+            
+            this.showNotification('Data refreshed successfully!', 'success');
+        } catch (error) {
+            console.error('Error refreshing data:', error);
+            this.showNotification('Failed to refresh data', 'error');
+        }
+    }
+
     searchFeedback() {
         const searchTerm = document.getElementById('search-input').value.toLowerCase();
         
