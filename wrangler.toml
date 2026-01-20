@@ -10,3 +10,15 @@ vars = { ENVIRONMENT = "production" }
 
 [env.production.routes]
 "/*" = "index.html"
+
+[[build.upload]]
+format = "modules"
+dir = "."
+
+[[build.upload.rules]]
+type = "ESModule"
+globs = ["**/*.js"]
+
+[[build.upload.rules]]
+type = "Text"
+globs = ["**/*.html", "**/*.css", "**/*.json", "**/*.toml"]
