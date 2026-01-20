@@ -1,0 +1,23 @@
+{
+  "name": "feedback-intelligence",
+  "version": "1.0.0",
+  "description": "AI-Powered Feedback Intelligence Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Static build complete'",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [
+    "feedback",
+    "analytics",
+    "ai",
+    "dashboard",
+    "cloudflare-pages"
+  ],
+  "author": "Feedback Intelligence Team",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
