@@ -2,19 +2,24 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     
-    // Handle feedback ingestion (mock for now)
+    // Handle feedback ingestion
     if (request.method === 'POST' && url.pathname === '/ingest') {
       try {
         const body = await request.json();
         const feedbackId = Date.now().toString();
         
-        // Mock storage - in production, use KV
-        console.log('Storing feedback:', { ...body, id: feedbackId });
+        // Store in KV with metadata
+        await env.FEEDBACK.put(feedbackId, JSON.stringify({
+          ...body,
+          id: feedbackId,
+          createdAt: new Date().toISOString(),
+          source: body.source || 'manual'
+        }));
         
         return Response.json({ 
           success: true, 
           id: feedbackId,
-          message: 'Feedback ingested successfully (mock)' 
+          message: 'Feedback ingested successfully' 
         });
       } catch (error) {
         return Response.json({ 
@@ -24,43 +29,43 @@ export default {
       }
     }
     
-    // Handle feedback retrieval (mock for now)
+    // Handle feedback retrieval
     if (url.pathname === '/feedback') {
       try {
-        // Mock data - in production, fetch from KV
-        const mockData = [
-          {
-            id: "1",
-            title: "Great dashboard!",
-            content: "Love the new interface and real-time updates",
-            author: "user123",
-            source: "discord",
-            sentiment: "positive",
-            urgency: "low",
-            themes: ["UI/UX"],
-            keywords: ["interface", "updates", "dashboard"],
-            createdAt: new Date().toISOString()
-          },
-          {
-            id: "2", 
-            title: "Performance issues",
-            content: "The dashboard is loading slowly with large datasets",
-            author: "dev456",
-            source: "github",
-            sentiment: "negative",
-            urgency: "high",
-            themes: ["Performance"],
-            keywords: ["slow", "loading", "performance"],
-            createdAt: new Date().toISOString()
-          }
-        ];
+        const list = await env.FEEDBACK.list();
+        const items = await Promise.all(
+          list.keys.map(async key => {
+            const value = await env.FEEDBACK.get(key.name);
+            return JSON.parse(value);
+          })
+        );
         
-        return Response.json(mockData);
+        // Sort by creation date (newest first)
+        items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        return Response.json(items);
       } catch (error) {
         return Response.json({ 
           success: false, 
           error: error.message 
         }, { status: 500 });
+      }
+    }
+    
+    // Handle feedback deletion
+    if (request.method === 'DELETE' && url.pathname.startsWith('/feedback/')) {
+      const id = url.pathname.split('/feedback/')[1];
+      try {
+        await env.FEEDBACK.delete(id);
+        return Response.json({ 
+          success: true, 
+          message: 'Feedback deleted successfully' 
+        });
+      } catch (error) {
+        return Response.json({ 
+          success: false, 
+          error: error.message 
+        }, { status: 400 });
       }
     }
     
