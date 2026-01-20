@@ -1,5 +1,9 @@
 name = "feedbackanalysis"
+<<<<<<< HEAD
 main = "./worker.js"
+=======
+main = "src/worker.js"
+>>>>>>> 748049261c515d4b928962ccdd9b59aced8d0b1e
 compatibility_date = "2025-01-20"
 
 assets = { directory = "./" }
