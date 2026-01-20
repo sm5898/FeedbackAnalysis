@@ -1,4 +1,4 @@
-name = "feedback-analysis"
+name = "feedbackanalysis"
 main = "src/worker.js"
 compatibility_date = "2025-01-20"
 
