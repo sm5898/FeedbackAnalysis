@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback Aggregator - Product Insights Dashboard</title>
+    <title>AI Feedback Intelligence Platform</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -14,153 +14,320 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-chart-line"></i>
-                    <h1>Feedback Aggregator</h1>
+                    <div class="logo-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Feedback Intelligence</h1>
+                        <span class="logo-subtitle">AI-Powered Product Insights</span>
+                    </div>
                 </div>
                 <div class="header-actions">
-                    <button class="btn btn-primary" onclick="exportData()">
+                    <button class="btn btn-primary" onclick="generateAIInsights()">
+                        <i class="fas fa-magic"></i> AI Insights
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
                         <i class="fas fa-download"></i> Export
                     </button>
-                    <button class="btn btn-secondary" onclick="refreshData()">
+                    <button class="btn btn-outline" onclick="refreshData()">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Stats Overview -->
-            <section class="stats-overview">
-                <div class="stat-card">
-                    <div class="stat-icon positive">
-                        <i class="fas fa-comments"></i>
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Stats Overview -->
+                <section class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-feedback">0</h3>
+                            <p>Total Feedback</p>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +12%
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <h3 id="total-feedback">0</h3>
-                        <p>Total Feedback</p>
+                    <div class="stat-card">
+                        <div class="stat-icon sentiment">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="avg-sentiment">0.0</h3>
+                            <p>Avg Sentiment</p>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +8%
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon neutral">
-                        <i class="fas fa-smile"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon urgent">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="urgent-items">0</h3>
+                            <p>Urgent Items</p>
+                            <div class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i> -5%
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <h3 id="avg-sentiment">0.0</h3>
-                        <p>Avg Sentiment</p>
+                    <div class="stat-card">
+                        <div class="stat-icon sources">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="active-sources">0</h3>
+                            <p>Active Sources</p>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-minus"></i> 0%
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon urgent">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 id="urgent-items">0</h3>
-                        <p>Urgent Items</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon info">
-                        <i class="fas fa-tags"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 id="top-theme">-</h3>
-                        <p>Top Theme</p>
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Filters Section -->
-            <section class="filters-section">
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <label for="source-filter">Source:</label>
-                        <select id="source-filter" onchange="applyFilters()">
-                            <option value="">All Sources</option>
-                            <option value="github">GitHub</option>
-                            <option value="discord">Discord</option>
-                            <option value="twitter">Twitter</option>
-                            <option value="email">Email</option>
-                            <option value="support">Support</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="sentiment-filter">Sentiment:</label>
-                        <select id="sentiment-filter" onchange="applyFilters()">
-                            <option value="">All Sentiments</option>
-                            <option value="positive">Positive</option>
-                            <option value="neutral">Neutral</option>
-                            <option value="negative">Negative</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="urgency-filter">Urgency:</label>
-                        <select id="urgency-filter" onchange="applyFilters()">
-                            <option value="">All Levels</option>
-                            <option value="critical">Critical</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="theme-filter">Theme:</label>
-                        <select id="theme-filter" onchange="applyFilters()">
-                            <option value="">All Themes</option>
-                        </select>
-                    </div>
-                    <div class="search-group">
-                        <input type="text" id="search-input" placeholder="Search feedback..." onkeyup="searchFeedback()">
-                        <i class="fas fa-search"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Charts Section -->
-            <section class="charts-section">
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3>Sentiment Trends</h3>
-                        <canvas id="sentiment-chart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Theme Distribution</h3>
-                        <canvas id="theme-chart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Source Breakdown</h3>
-                        <canvas id="source-chart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Urgency Levels</h3>
-                        <canvas id="urgency-chart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Feedback List -->
-            <section class="feedback-section">
-                <div class="section-header">
-                    <h2>Recent Feedback</h2>
-                    <div class="view-toggle">
-                        <button class="toggle-btn active" onclick="setView('list')">
-                            <i class="fas fa-list"></i>
-                        </button>
-                        <button class="toggle-btn" onclick="setView('grid')">
-                            <i class="fas fa-th"></i>
+                <!-- Advanced Filters -->
+                <section class="filters-section">
+                    <div class="filters-header">
+                        <h2><i class="fas fa-filter"></i> Smart Filters</h2>
+                        <button class="btn btn-sm btn-outline" onclick="toggleAdvancedFilters()">
+                            <i class="fas fa-cog"></i> Advanced
                         </button>
                     </div>
+                    
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="source-filter">Source:</label>
+                            <select id="source-filter" onchange="applyFilters()">
+                                <option value="">All Sources</option>
+                                <option value="github">GitHub</option>
+                                <option value="discord">Discord</option>
+                                <option value="reddit">Reddit</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="email">Email</option>
+                                <option value="support">Support</option>
+                                <option value="forums">Forums</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="sentiment-filter">Sentiment:</label>
+                            <select id="sentiment-filter" onchange="applyFilters()">
+                                <option value="">All Sentiments</option>
+                                <option value="positive">Positive</option>
+                                <option value="neutral">Neutral</option>
+                                <option value="negative">Negative</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="urgency-filter">Urgency:</label>
+                            <select id="urgency-filter" onchange="applyFilters()">
+                                <option value="">All Levels</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="theme-filter">Theme:</label>
+                            <select id="theme-filter" onchange="applyFilters()">
+                                <option value="">All Themes</option>
+                            </select>
+                        </div>
+                        <div class="search-group">
+                            <input type="text" id="search-input" placeholder="AI-powered search..." onkeyup="searchFeedback()">
+                            <button class="search-btn" onclick="performAISearch()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Filters (Hidden by default) -->
+                    <div id="advanced-filters" class="advanced-filters" style="display: none;">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="date-range">Date Range:</label>
+                                <input type="date" id="date-from" onchange="applyFilters()">
+                                <span>to</span>
+                                <input type="date" id="date-to" onchange="applyFilters()">
+                            </div>
+                            <div class="filter-group">
+                                <label for="author-filter">Author:</label>
+                                <input type="text" id="author-filter" placeholder="Filter by author..." onkeyup="applyFilters()">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="charts-header">
+                        <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" onclick="setChartPeriod('7d')">7D</button>
+                            <button class="chart-btn" onclick="setChartPeriod('30d')">30D</button>
+                            <button class="chart-btn" onclick="setChartPeriod('90d')">90D</button>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Sentiment Trends</h3>
+                            <div class="chart-container">
+                                <canvas id="sentiment-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Source Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="source-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Theme Analysis</h3>
+                            <div class="chart-container">
+                                <canvas id="theme-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Urgency Breakdown</h3>
+                            <div class="chart-container">
+                                <canvas id="urgency-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Feedback List -->
+                <section class="feedback-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-list"></i> Feedback Stream</h2>
+                        <div class="view-controls">
+                            <button class="view-btn active" onclick="setView('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="view-btn" onclick="setView('cards')">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-btn" onclick="setView('compact')">
+                                <i class="fas fa-compress"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="feedback-container" class="feedback-list">
+                        <!-- Feedback items will be dynamically added here -->
+                    </div>
+                    <div class="load-more">
+                        <button class="btn btn-outline" onclick="loadMoreFeedback()">
+                            <i class="fas fa-plus"></i> Load More
+                        </button>
+                    </div>
+                </section>
+            </main>
+
+            <!-- AI Assistant Panel -->
+            <aside class="ai-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-robot"></i> AI Assistant</h2>
+                    <div class="ai-status">
+                        <span class="status-indicator active"></span>
+                        <span class="status-text">AI Active</span>
+                    </div>
                 </div>
-                <div id="feedback-container" class="feedback-list">
-                    <!-- Feedback items will be dynamically added here -->
+                
+                <div class="ai-content">
+                    <!-- AI Chat Interface -->
+                    <div class="ai-section">
+                        <h3><i class="fas fa-comments"></i> Conversation</h3>
+                        <div class="ai-chat-container">
+                            <div class="chat-messages" id="chat-messages">
+                                <div class="ai-message">
+                                    <div class="message-header">
+                                        <i class="fas fa-robot"></i>
+                                        <span>AI Assistant</span>
+                                    </div>
+                                    <div class="message-content">
+                                        Hello! I'm your AI feedback analyst. I can help you understand insights, dive deeper into specific themes, or answer questions about the feedback data. What would you like to explore?
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <input type="text" id="ai-chat-input" placeholder="Ask me anything about feedback data..." onkeypress="handleChatInput(event)">
+                                <button class="chat-send-btn" onclick="sendAIMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Summary -->
+                    <div class="ai-section">
+                        <h3><i class="fas fa-chart-line"></i> Executive Summary</h3>
+                        <div id="ai-summary" class="ai-text">
+                            <div class="loading-skeleton">
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Insights -->
+                    <div class="ai-section">
+                        <h3><i class="fas fa-lightbulb"></i> Key Insights</h3>
+                        <div id="key-insights" class="insights-list">
+                            <div class="loading-skeleton">
+                                <div class="skeleton-item"></div>
+                                <div class="skeleton-item"></div>
+                                <div class="skeleton-item"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="ai-section">
+                        <h3><i class="fas fa-tasks"></i> Action Items</h3>
+                        <div id="recommendations" class="recommendations-list">
+                            <div class="loading-skeleton">
+                                <div class="skeleton-item"></div>
+                                <div class="skeleton-item"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend Analysis -->
+                    <div class="ai-section">
+                        <h3><i class="fas fa-chart-area"></i> Trend Analysis</h3>
+                        <div id="trend-analysis" class="trend-cards">
+                            <div class="trend-card">
+                                <div class="trend-icon positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <div class="trend-info">
+                                    <span class="trend-value">+24%</span>
+                                    <span class="trend-label">Positive Sentiment</span>
+                                </div>
+                            </div>
+                            <div class="trend-card">
+                                <div class="trend-icon neutral">
+                                    <i class="fas fa-minus"></i>
+                                </div>
+                                <div class="trend-info">
+                                    <span class="trend-value">0%</span>
+                                    <span class="trend-label">Urgency Level</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="load-more">
-                    <button class="btn btn-outline" onclick="loadMoreFeedback()">
-                        Load More
-                    </button>
-                </div>
-            </section>
-        </main>
+            </aside>
+        </div>
     </div>
 
     <!-- Feedback Detail Modal -->
@@ -187,13 +354,19 @@
                                 <i class="fas fa-external-link-alt"></i> View Original
                             </a>
                         </div>
-                        <div class="detail-themes">
-                            <h4>Themes:</h4>
-                            <div id="detail-themes"></div>
-                        </div>
-                        <div class="detail-keywords">
-                            <h4>Keywords:</h4>
-                            <div id="detail-keywords"></div>
+                        <div class="detail-analysis">
+                            <div class="analysis-section">
+                                <h4><i class="fas fa-brain"></i> AI Analysis</h4>
+                                <div id="ai-analysis" class="ai-analysis-text"></div>
+                            </div>
+                            <div class="detail-themes">
+                                <h4><i class="fas fa-tags"></i> Themes</h4>
+                                <div id="detail-themes"></div>
+                            </div>
+                            <div class="detail-keywords">
+                                <h4><i class="fas fa-key"></i> Keywords</h4>
+                                <div id="detail-keywords"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
