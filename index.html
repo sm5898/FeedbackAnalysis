@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Aggregator - Product Insights Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>Feedback Aggregator</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Overview -->
+            <section class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon positive">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-feedback">0</h3>
+                        <p>Total Feedback</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon neutral">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="avg-sentiment">0.0</h3>
+                        <p>Avg Sentiment</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon urgent">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="urgent-items">0</h3>
+                        <p>Urgent Items</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="top-theme">-</h3>
+                        <p>Top Theme</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="source-filter">Source:</label>
+                        <select id="source-filter" onchange="applyFilters()">
+                            <option value="">All Sources</option>
+                            <option value="github">GitHub</option>
+                            <option value="discord">Discord</option>
+                            <option value="twitter">Twitter</option>
+                            <option value="email">Email</option>
+                            <option value="support">Support</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sentiment-filter">Sentiment:</label>
+                        <select id="sentiment-filter" onchange="applyFilters()">
+                            <option value="">All Sentiments</option>
+                            <option value="positive">Positive</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="negative">Negative</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="urgency-filter">Urgency:</label>
+                        <select id="urgency-filter" onchange="applyFilters()">
+                            <option value="">All Levels</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="theme-filter">Theme:</label>
+                        <select id="theme-filter" onchange="applyFilters()">
+                            <option value="">All Themes</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="search-input" placeholder="Search feedback..." onkeyup="searchFeedback()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Sentiment Trends</h3>
+                        <canvas id="sentiment-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Theme Distribution</h3>
+                        <canvas id="theme-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Source Breakdown</h3>
+                        <canvas id="source-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Urgency Levels</h3>
+                        <canvas id="urgency-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feedback List -->
+            <section class="feedback-section">
+                <div class="section-header">
+                    <h2>Recent Feedback</h2>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" onclick="setView('list')">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button class="toggle-btn" onclick="setView('grid')">
+                            <i class="fas fa-th"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="feedback-container" class="feedback-list">
+                    <!-- Feedback items will be dynamically added here -->
+                </div>
+                <div class="load-more">
+                    <button class="btn btn-outline" onclick="loadMoreFeedback()">
+                        Load More
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Feedback Detail Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Feedback Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="feedback-detail">
+                    <div class="detail-header">
+                        <div class="source-badge" id="modal-source"></div>
+                        <div class="sentiment-badge" id="modal-sentiment"></div>
+                        <div class="urgency-badge" id="modal-urgency"></div>
+                    </div>
+                    <div class="detail-content">
+                        <h3 id="detail-title"></h3>
+                        <p id="detail-content"></p>
+                        <div class="detail-meta">
+                            <span id="detail-author"></span>
+                            <span id="detail-date"></span>
+                            <a id="detail-link" href="#" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> View Original
+                            </a>
+                        </div>
+                        <div class="detail-themes">
+                            <h4>Themes:</h4>
+                            <div id="detail-themes"></div>
+                        </div>
+                        <div class="detail-keywords">
+                            <h4>Keywords:</h4>
+                            <div id="detail-keywords"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
