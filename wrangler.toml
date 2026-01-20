@@ -2,23 +2,8 @@ name = "feedback-intelligence"
 main = "index.html"
 compatibility_date = "2024-01-20"
 
-[build]
-command = ""
-
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
-[env.production.routes]
-"/*" = "index.html"
-
-[[build.upload]]
-format = "modules"
-dir = "."
-
-[[build.upload.rules]]
-type = "ESModule"
-globs = ["**/*.js"]
-
-[[build.upload.rules]]
-type = "Text"
-globs = ["**/*.html", "**/*.css", "**/*.json", "**/*.toml"]
+[env.production.pages]
+compatibility_flags = ["nodejs_compat"]
