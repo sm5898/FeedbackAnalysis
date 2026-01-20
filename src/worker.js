@@ -65,7 +65,7 @@ export default {
         return Response.json({ 
           success: false, 
           error: error.message 
-        }, { status: 400 });
+        }, { status: 500 });
       }
     }
     
@@ -92,7 +92,7 @@ export default {
         return Response.json({ 
           success: false, 
           error: error.message 
-        }, { status: 400 });
+        }, { status: 500 });
       }
     }
     
