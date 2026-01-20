@@ -1,8 +1,8 @@
 // Advanced Feedback Intelligence Platform
 class FeedbackIntelligenceApp {
     constructor() {
-        this.feedback = [...sampleFeedback];
-        this.filteredFeedback = [...this.feedback];
+        this.feedback = [];
+        this.filteredFeedback = [];
         this.currentView = 'list';
         this.currentPage = 1;
         this.itemsPerPage = 10;
@@ -13,7 +13,10 @@ class FeedbackIntelligenceApp {
         this.init();
     }
 
-    init() {
+    async init() {
+        // Load feedback from Cloudflare Worker
+        await this.loadFeedbackFromWorker();
+        
         this.updateStats();
         this.populateThemeFilter();
         this.renderFeedback();
@@ -21,6 +24,26 @@ class FeedbackIntelligenceApp {
         this.loadAIInsights();
         this.setupEventListeners();
         this.startRealTimeUpdates();
+    }
+
+    async loadFeedbackFromWorker() {
+        try {
+            const response = await fetch('/feedback');
+            if (response.ok) {
+                const data = await response.json();
+                this.feedback = data;
+                this.filteredFeedback = [...this.feedback];
+            } else {
+                // Fallback to static data if Worker is unavailable
+                this.feedback = [...sampleFeedback];
+                this.filteredFeedback = [...this.feedback];
+            }
+        } catch (error) {
+            console.log('Error loading feedback from Worker:', error);
+            // Fallback to static data
+            this.feedback = [...sampleFeedback];
+            this.filteredFeedback = [...this.feedback];
+        }
     }
 
     // Update dashboard statistics with animations
@@ -851,13 +874,13 @@ class FeedbackIntelligenceApp {
     }
 
     // AI Chat functionality
-    handleChatInput(event) {
+    async handleChatInput(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
-            this.sendAIMessage();
+            await this.sendAIMessage();
         }
     }
 
-    sendAIMessage() {
+    async sendAIMessage() {
         const input = document.getElementById('ai-chat-input');
         const message = input.value.trim();
         
@@ -867,7 +890,7 @@ class FeedbackIntelligenceApp {
         this.addChatMessage(message, 'user');
         
         // Generate AI response
-        const aiResponse = this.generateAIResponse(message);
+        const aiResponse = await this.generateAIResponse(message);
         
         // Add AI response to chat
         setTimeout(() => {
@@ -878,50 +901,40 @@ class FeedbackIntelligenceApp {
         input.value = '';
     }
 
-    addChatMessage(message, sender) {
-        const chatMessages = document.getElementById('chat-messages');
-        
-        const messageElement = document.createElement('div');
-        messageElement.className = `chat-message ${sender}-message`;
-        
-        if (sender === 'user') {
-            messageElement.innerHTML = `
-                <div class="message-header">
-                    <i class="fas fa-user"></i>
-                    <span>You</span>
-                </div>
-                <div class="message-content">${this.escapeHtml(message)}</div>
-            `;
-        } else {
-            messageElement.innerHTML = `
-                <div class="message-header">
-                    <i class="fas fa-robot"></i>
-                    <span>AI Assistant</span>
-                </div>
-                <div class="message-content">${message}</div>
-            `;
-        }
-        
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    generateAIResponse(userMessage) {
+    async generateAIResponse(userMessage) {
         const responses = {
-            'themes': `Based on the current feedback data, the top themes are: ${this.aiInsights.trends.themes.top.join(', ')}. These themes represent ${this.aiInsights.trends.themes.top.length * 100}% of critical issues.`,
+            'themes': `Based on current feedback data, top themes are: ${this.aiInsights.trends.themes.top.join(', ')}. These themes represent ${this.aiInsights.trends.themes.top.length * 100}% of critical issues.`,
             
             'sentiment': `Current sentiment trend is ${this.aiInsights.trends.sentiment.direction} with a ${this.aiInsights.trends.sentiment.change} change. The average sentiment score is ${this.aiInsights.trends.sentiment.current}.`,
             
-            'urgency': `Urgency levels are ${this.aiInsights.trends.urgency.direction}. Critical issues require immediate attention, while high-priority items should be addressed in the current sprint.`,
+            'urgency': `Urgency levels are ${this.aiInsights.trends.urgency.direction}. Critical issues require immediate attention, while high-priority items should be addressed in current sprint.`,
             
             'recommendations': `I recommend prioritizing the ${this.aiInsights.recommendations[0].priority} issues first: ${this.aiInsights.recommendations[0].action}`,
             
-            'sources': `Feedback is distributed across ${Object.keys(this.getSourceDistribution()).length} sources, with ${this.getTopSource()} being the most active.`,
+            'sources': `Feedback is distributed across ${Object.keys(this.getSourceDistribution()).length} sources, with ${this.getTopSource()} being most active.`,
             
             'default': `I can analyze specific feedback items, themes, or provide detailed insights. What specific aspect would you like to explore?`
         };
 
-        // Simple keyword matching for responses
+        // Try to get real-time analysis from Worker
+        try {
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedback: { content: userMessage } })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    return `AI Analysis: ${data.analysis.sentiment} sentiment detected. Key themes: ${data.analysis.themes.join(', ')}. Recommendations: ${data.analysis.recommendations.join(', ')}`;
+                }
+            }
+        } catch (error) {
+            console.log('Error getting AI analysis:', error);
+        }
+
+        // Fallback to keyword matching
         const lowerMessage = userMessage.toLowerCase();
         
         for (const [key, response] of Object.entries(responses)) {

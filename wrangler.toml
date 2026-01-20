@@ -1,9 +1,15 @@
-name = "feedback-intelligence"
-main = "index.html"
-compatibility_date = "2024-01-20"
+name = "feedback-analysis"
+main = "src/worker.js"
+compatibility_date = "2025-01-20"
 
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
 [env.production.pages]
 compatibility_flags = ["nodejs_compat"]
+
+assets = { directory = "./" }
+
+kv_namespaces = [
+  { binding = "FEEDBACK", id = "feedback-kv" }
+]
