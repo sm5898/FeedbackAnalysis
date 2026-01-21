@@ -28,22 +28,34 @@ class FeedbackIntelligenceApp {
 
     async loadFeedbackFromWorker() {
         try {
+            // Try new API endpoint first
+            const response = await fetch('/api/feedback');
+            if (response.ok) {
+                const data = await response.json();
+                this.feedback = data;
+                this.filteredFeedback = [...this.feedback];
+                return;
+            }
+        } catch (error) {
+            console.log('Error loading from /api/feedback:', error);
+        }
+
+        try {
+            // Fallback to legacy endpoint
             const response = await fetch('/feedback');
             if (response.ok) {
                 const data = await response.json();
                 this.feedback = data;
                 this.filteredFeedback = [...this.feedback];
-            } else {
-                // Fallback to static data if Worker is unavailable
-                this.feedback = [...sampleFeedback];
-                this.filteredFeedback = [...this.feedback];
+                return;
             }
         } catch (error) {
-            console.log('Error loading feedback from Worker:', error);
-            // Fallback to static data
-            this.feedback = [...sampleFeedback];
-            this.filteredFeedback = [...this.feedback];
+            console.log('Error loading from /feedback:', error);
         }
+
+        // Final fallback to static data
+        this.feedback = [...sampleFeedback];
+        this.filteredFeedback = [...this.feedback];
     }
 
     // Update dashboard statistics with animations
@@ -937,9 +949,9 @@ class FeedbackIntelligenceApp {
             'default': `I can analyze specific feedback items, themes, or provide detailed insights. What specific aspect would you like to explore?`
         };
 
-        // Try to get real-time analysis from Worker
+        // Try to get real-time AI analysis from Worker
         try {
-            const response = await fetch('/analyze', {
+            const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ feedback: { content: userMessage } })
@@ -947,12 +959,25 @@ class FeedbackIntelligenceApp {
             
             if (response.ok) {
                 const data = await response.json();
-                if (data.success) {
-                    return `AI Analysis: ${data.analysis.sentiment} sentiment detected. Key themes: ${data.analysis.themes.join(', ')}. Recommendations: ${data.analysis.recommendations.join(', ')}`;
+                if (data.response) {
+                    return `AI Analysis: ${data.response}`;
                 }
             }
         } catch (error) {
             console.log('Error getting AI analysis:', error);
+        }
+
+        // Try AI summarization endpoint
+        try {
+            const response = await fetch('/api/summarize');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.response) {
+                    return `AI Summary: ${data.response}`;
+                }
+            }
+        } catch (error) {
+            console.log('Error getting AI summary:', error);
         }
 
         // Fallback to keyword matching

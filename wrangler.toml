@@ -7,3 +7,6 @@ assets = { directory = "./public" }
 [[kv_namespaces]]
 binding = "FEEDBACK"
 id = "aad8715d2833452b8c3d1efe03b0c0ea"
+
+[ai]
+binding = "AI"
